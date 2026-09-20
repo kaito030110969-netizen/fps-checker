@@ -16,6 +16,9 @@ export const metadata = {
   title: "PC FPS診断",
   description:
     "CPU・GPU・ゲームからFPS、ボトルネック、アップグレード候補を確認できるPC性能診断サイト",
+    verification: {
+    google: "FZALjOel-8qrhuLP2D6A1WA6jQkiw93DYKd_rYwetGw",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
