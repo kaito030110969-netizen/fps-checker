@@ -5,13 +5,16 @@ import { checkPsu, type PsuCheck } from "./data/psu";
 import { gpus, type GPU } from "./data/gpus";
 import { cpus, type CPU } from "./data/cpus";
 import { games, type Game } from "./data/games";
+import { rakutenAffiliateLinks } from "./data/affiliate";
 import {
   gpuPrices,
   cpuPrices,
-  getComparablePrice,
+  getComparablePriceInfo,
   calculateYenPerFps,
   pickBestValue,
   type PriceInfo,
+  type UsedPriceInfo,
+  type MercariMarketInfo,
 } from "./data/prices";
 
 type Result = {
@@ -26,8 +29,8 @@ type Result = {
 
 const resolutionFactors: Record<string, number> = {
   "1080p": 1,
-  "1440p": 0.73,
-  "4K": 0.43,
+  "1440p": 0.67,
+  "4K": 0.24,
 };
 
 const qualityFactors: Record<string, number> = {
@@ -129,6 +132,7 @@ export default function Home() {
   const [quality, setQuality] = useState("High");
   const [ram, setRam] = useState("16");
   const [psu, setPsu] = useState("unknown");
+  const [includeUsed, setIncludeUsed] = useState(false);
   const [hasCalculated, setHasCalculated] = useState(false);
 
   const cpu = cpus.find((item) => item.id === cpuId)!;
@@ -192,8 +196,9 @@ const vramDifference =
     const priceInfo =
       cpuPrices[candidate.id];
 
-    const priceYen =
-      getComparablePrice(priceInfo);
+    const comparablePrice =
+      getComparablePriceInfo(priceInfo, includeUsed);
+    const priceYen = comparablePrice?.priceYen ?? null;
 
     const fpsGain =
       newResult.avg -
@@ -238,7 +243,8 @@ if (avgGain < 5) {
       fpsGain,
 
       priceYen,
-      priceInfo,
+      priceInfo: comparablePrice?.info,
+      priceType: comparablePrice?.type ?? null,
       updatedAt:
         priceInfo?.updatedAt ?? null,
 
@@ -289,8 +295,9 @@ const allGpuUpgrades = gpus
 
     const priceInfo = gpuPrices[candidate.id];
 
-    const priceYen =
-      getComparablePrice(priceInfo);
+    const comparablePrice =
+      getComparablePriceInfo(priceInfo, includeUsed);
+    const priceYen = comparablePrice?.priceYen ?? null;
 
     const fpsGain =
       newResult.avg - currentPerformance.avg;
@@ -334,7 +341,8 @@ if (avgGain < 5) {
       fpsGain,
 
       priceYen,
-      priceInfo,
+      priceInfo: comparablePrice?.info,
+      priceType: comparablePrice?.type ?? null,
       updatedAt:
         priceInfo?.updatedAt ?? null,
 
@@ -522,6 +530,21 @@ if (
             </p>
           </div>
 
+          <label className="flex items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-950 p-4 md:col-span-2">
+            <input
+              type="checkbox"
+              checked={includeUsed}
+              onChange={(event) => setIncludeUsed(event.target.checked)}
+              className="mt-1 h-4 w-4 accent-green-500"
+            />
+            <span>
+              <span className="block font-semibold text-zinc-200">中古も含める</span>
+              <span className="mt-1 block text-sm leading-6 text-zinc-400">
+                新品価格が確認できない候補だけ、中古参考価格をコスパ計算に使用します。中古価格が未登録の候補は計算対象になりません。
+              </span>
+            </span>
+          </label>
+
           <button
             onClick={calculate}
             className="md:col-span-2 rounded-xl bg-green-500 px-6 py-4 text-lg font-bold text-black hover:bg-green-400"
@@ -685,8 +708,9 @@ if (
   </div>
 
   <div className="mb-5 rounded-xl border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-400">
-    <p>参考価格は国内新品・税込の掲載モデル1商品の販売例です。最安値ではなく、自動更新でもありません。確認日と販売店リンクをご覧ください。</p>
-    <p className="mt-2">1FPS向上あたり＝交換パーツの参考価格 ÷ 推定平均FPSの増加量。送料・ポイント・売却額・電源などの追加費用は含みません。新品価格を確認できない候補は価格比較から除外します。</p>
+    <p>新品参考価格は国内新品・税込の掲載モデル1商品の販売例です。最安値ではなく、自動更新でもありません。確認日と販売店リンクをご覧ください。</p>
+    <p className="mt-2">1FPS向上あたり＝交換パーツの参考価格 ÷ 推定平均FPSの増加量。送料・ポイント・売却額・電源などの追加費用は含みません。新品価格がある場合は新品を優先し、中古を含める設定では新品価格がない候補だけ中古参考価格を使用します。</p>
+    <p className="mt-2">現在、中古価格を確認できた商品は登録していません。価格未確認の商品に架空の価格は設定していません。</p>
   </div>
 
   <div className="grid gap-4 lg:grid-cols-3">
@@ -755,8 +779,8 @@ if (
             </section>
 
             <div className="mt-8 rounded-xl border border-yellow-900 bg-yellow-950/30 p-5 text-sm text-yellow-200">
-              現在の数値は開発用の性能指数から計算した推定値です。
-              公開版では実測ベンチマークデータを使って精度を改善します。
+              表示FPSはベンチマーク傾向をもとにした目安です。
+              実際のFPSはゲームバージョン、ドライバー、設定、冷却などにより変動します。
             </div>
           </>
         )}
@@ -766,7 +790,7 @@ if (
 }
 function formatPrice(price: number | null | undefined) {
   if (!price) {
-    return "新品価格未確認";
+    return "価格未確認";
   }
 
   return `¥${price.toLocaleString("ja-JP")}`;
@@ -1130,6 +1154,9 @@ function GameSelect({
     );
   });
 
+  const selectedGame = games.find((game) => game.id === value);
+  const isSelectedGameVisible = filteredGames.some((game) => game.id === value);
+
   const groupedGames = filteredGames.reduce<Record<string, Game[]>>(
     (groups, game) => {
       if (!groups[game.category]) {
@@ -1165,6 +1192,11 @@ function GameSelect({
         }}
         className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-green-500"
       >
+        {selectedGame && !isSelectedGameVisible && (
+          <option value={selectedGame.id}>
+            {selectedGame.name}（選択中）
+          </option>
+        )}
         {Object.keys(groupedGames).length > 0 ? (
           Object.entries(groupedGames).map(
             ([category, categoryGames]) => (
@@ -1256,12 +1288,14 @@ function RecommendationCard({
   item:
     | {
         name: string;
+          id: string;
         avg: number;
         low: number;
         avgGain: number;
         lowGain: number;
         priceYen: number | null;
-        priceInfo: PriceInfo | undefined;
+        priceInfo: PriceInfo | UsedPriceInfo | undefined;
+        priceType: "新品" | "中古" | null;
         yenPerFps: number | null;
         bottleneck: string;
         psuCheck: PsuCheck;
@@ -1291,6 +1325,8 @@ function RecommendationCard({
       <h3 className="mt-2 text-xl font-bold">
         {item.name}
       </h3>
+
+      <RakutenLinkButton rakutenUrl={rakutenAffiliateLinks[item.id]?.rakutenUrl} />
 
       <div className="mt-5 space-y-3">
 
@@ -1326,7 +1362,11 @@ function RecommendationCard({
 
         <div className="flex justify-between">
           <span className="text-zinc-400">
-            参考価格（税込）
+            {item.priceType === "中古"
+              ? "中古参考価格"
+              : item.priceType === "新品"
+                ? "新品参考価格（税込）"
+                : "価格未確認"}
           </span>
 
           <span className="font-bold">
@@ -1334,7 +1374,7 @@ function RecommendationCard({
           </span>
         </div>
 
-        <PriceDetails info={item.priceInfo} />
+        <PriceDetails info={item.priceInfo} type={item.priceType} />
 
         {item.yenPerFps !== null && (
           <div className="flex justify-between">
@@ -1369,6 +1409,7 @@ function RecommendationCard({
 }
 
 function UpgradeCard({
+  id,
   type,
   name,
   avg,
@@ -1378,12 +1419,14 @@ function UpgradeCard({
   fpsGain,
   priceYen,
   priceInfo,
+  priceType,
   yenPerFps,
   bottleneck,
   effect,
   warning,
   psuCheck,
 }: {
+  id: string;
   type: string;
   name: string;
   avg: number;
@@ -1392,7 +1435,8 @@ function UpgradeCard({
   lowGain: number;
   fpsGain: number;
   priceYen: number | null;
-  priceInfo: PriceInfo | undefined;
+  priceInfo: PriceInfo | UsedPriceInfo | undefined;
+  priceType: "新品" | "中古" | null;
   updatedAt: string | null;
   yenPerFps: number | null;
   bottleneck: string;
@@ -1416,6 +1460,8 @@ function UpgradeCard({
           <p className="mt-2 text-sm text-zinc-400">
             {effect}
           </p>
+
+          <RakutenLinkButton rakutenUrl={rakutenAffiliateLinks[id]?.rakutenUrl} />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -1450,14 +1496,18 @@ function UpgradeCard({
 
           <div className="rounded-xl bg-zinc-950 p-4">
             <p className="text-xs text-zinc-500">
-              参考価格（税込）
+              {priceType === "中古"
+                ? "中古参考価格"
+                : priceType === "新品"
+                  ? "新品参考価格（税込）"
+                  : "価格未確認"}
             </p>
 
             <p className="mt-1 text-xl font-bold">
               {formatPrice(priceYen)}
             </p>
 
-            <PriceDetails info={priceInfo} />
+            <PriceDetails info={priceInfo} type={priceType} />
           </div>
 
           <div className="rounded-xl bg-zinc-950 p-4">
@@ -1531,6 +1581,21 @@ function UpgradeCard({
   );
 }
 
+function RakutenLinkButton({ rakutenUrl }: { rakutenUrl: string | null | undefined }) {
+  if (!rakutenUrl) return null;
+
+  return (
+    <a
+      className="mt-4 inline-flex w-fit items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white hover:bg-red-500"
+      href={rakutenUrl}
+      target="_blank"
+      rel="sponsored nofollow noopener noreferrer"
+    >
+      楽天市場で探す <span className="ml-2 text-xs">広告・PR</span>
+    </a>
+  );
+}
+
 function PsuStatus({ check }: { check: PsuCheck }) {
   const styles = {
     sufficient: "border-green-900 bg-green-950/20 text-green-200",
@@ -1555,12 +1620,46 @@ function PsuStatus({ check }: { check: PsuCheck }) {
   );
 }
 
-function PriceDetails({ info }: { info: PriceInfo | undefined }) {
-  if (!info) return <p className="mt-2 text-xs text-zinc-400">新品の参考価格は未調査です。</p>;
+function PriceDetails({
+  info,
+  type,
+}: {
+  info: PriceInfo | UsedPriceInfo | undefined;
+  type: "新品" | "中古" | null;
+}) {
+  if (!info) {
+    return (
+      <p className="mt-2 text-xs text-zinc-400">
+        {type === "中古"
+          ? "中古参考価格は未確認です。"
+          : type === "新品"
+            ? "新品参考価格は未確認です。"
+            : "価格未確認です。"}
+      </p>
+    );
+  }
+
+  const usedInfo = "condition" in info ? info : null;
+  const mercariMarket = "mercariMarket" in info
+    ? info.mercariMarket
+    : null;
+
   return (
     <div className="mt-2 space-y-2 text-xs text-zinc-400">
-      {info.updatedAt && <p>掲載確認日：{info.updatedAt}</p>}
+      <p className="font-semibold text-zinc-300">
+        {type === "中古"
+          ? "中古参考価格"
+          : type === "新品"
+            ? "新品参考価格（税込）"
+            : "価格未確認"}
+      </p>
+      {info.updatedAt && <p>価格確認日：{info.updatedAt}</p>}
+      {usedInfo?.condition && <p>状態：{usedInfo.condition}</p>}
+      {usedInfo?.warranty && <p>保証：{usedInfo.warranty}</p>}
       <p>{info.note}</p>
+      {mercariMarket?.medianPriceYen !== null && mercariMarket?.medianPriceYen !== undefined && (
+        <MercariMarketDetails market={mercariMarket} />
+      )}
       <details>
         <summary className="cursor-pointer text-zinc-300">価格の確認元・対象モデル</summary>
         <p className="mt-2 break-words">{info.productName}</p>
@@ -1574,7 +1673,34 @@ function PriceDetails({ info }: { info: PriceInfo | undefined }) {
             商品ページで現在の価格・在庫を確認
           </a>
         )}
+        {"historical" in info && info.historical && info.historical.length > 0 && (
+          <div className="mt-3 border-t border-zinc-800 pt-2">
+            <p>過去の参考価格（現在のコスパ計算には不使用）</p>
+            {info.historical.map((historical) => (
+              <p key={`${historical.checkedAt}-${historical.priceYen}`}>
+                ¥{historical.priceYen.toLocaleString("ja-JP")} / {historical.checkedAt}
+              </p>
+            ))}
+          </div>
+        )}
       </details>
+    </div>
+  );
+}
+
+function MercariMarketDetails({ market }: { market: MercariMarketInfo }) {
+  if (market.medianPriceYen === null) return null;
+
+  return (
+    <div className="mt-3 border-t border-zinc-800 pt-3">
+      <p className="font-semibold text-zinc-300">メルカリ中古相場</p>
+      <p className="mt-1 text-base font-bold text-white">
+        ¥{market.medianPriceYen.toLocaleString("ja-JP")}
+      </p>
+      {market.sampleCount !== null && <p>サンプル数：{market.sampleCount}件</p>}
+      {market.updatedAt && <p>更新日：{market.updatedAt}</p>}
+      {market.condition && <p>条件：{market.condition}</p>}
+      {market.note && <p>{market.note}</p>}
     </div>
   );
 }

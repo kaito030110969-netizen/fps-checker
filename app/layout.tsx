@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
+import SiteFooter from "./components/SiteFooter";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,11 +14,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL("https://fps-checker-gamma.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
   title: "PC FPS診断",
   description:
     "CPU・GPU・ゲームからFPS、ボトルネック、アップグレード候補を確認できるPC性能診断サイト",
-    verification: {
+  verification: {
     google: "FZALjOel-8qrhuLP2D6A1WA6jQkiw93DYKd_rYwetGw",
   },
 };
@@ -25,27 +30,28 @@ export const metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="ja"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-  <Script
-    src="https://www.googletagmanager.com/gtag/js?id=G-KR91B23H1P"
-    strategy="afterInteractive"
-  />
+      <body className="flex min-h-full flex-col">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-KR91B23H1P"
+          strategy="afterInteractive"
+        />
 
-  <Script id="google-analytics" strategy="afterInteractive">
-    {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
 
-      gtag('config', 'G-KR91B23H1P');
-    `}
-  </Script>
+            gtag('config', 'G-KR91B23H1P');
+          `}
+        </Script>
 
-  {children}
-</body>
+        <div className="flex-1">{children}</div>
+        <SiteFooter />
+      </body>
     </html>
   );
 }
