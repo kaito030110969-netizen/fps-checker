@@ -1,25 +1,38 @@
 import Link from "next/link";
 import { siteConfig } from "../site-config";
+import AdSlot from "./AdSlot";
+import styles from "./site-footer.module.css";
 
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-zinc-800 bg-zinc-950">
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        <p className="rounded-xl border border-green-900/80 bg-green-950/30 px-4 py-3 text-sm leading-6 text-green-100">
+    <footer className={styles.footer}>
+      <div className={styles.inner}>
+        <AdSlot placement="before-footer" />
+        <div className={styles.top}>
+          <div>
+            <Link href="/" className={styles.brand} aria-label="PC FPS診断 トップ">
+              <span className={styles.brandMark} aria-hidden="true">F</span>
+              <span>FPS<span className={styles.brandLight}> CHECKER</span></span>
+            </Link>
+            <p className={styles.tagline}>次のアップグレードに、確かな目安を。</p>
+          </div>
+          <p className={styles.motto}>KNOW YOUR BUILD. FIND YOUR NEXT.</p>
+        </div>
+        <p className={styles.notice}>
           このサイトはアフィリエイト広告を利用しています。
         </p>
 
-        <div className="mt-6 flex flex-col gap-5 text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
+        <div className={styles.bottom}>
           <p>© {new Date().getFullYear()} {siteConfig.name}</p>
 
-          <nav aria-label="フッターナビゲーション" className="flex flex-wrap gap-x-5 gap-y-2">
-            <Link className="transition hover:text-green-400" href="/privacy-policy">
+          <nav aria-label="フッターナビゲーション" className={styles.nav}>
+            <Link href="/privacy-policy">
               プライバシーポリシー
             </Link>
-            <Link className="transition hover:text-green-400" href="/operator">
+            <Link href="/operator">
               運営者情報
             </Link>
-            <Link className="transition hover:text-green-400" href="/contact">
+            <Link href="/contact">
               お問い合わせ
             </Link>
           </nav>

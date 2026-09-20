@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import AdSlot from "./components/AdSlot";
+import styles from "./page.module.css";
 import { checkPsu, type PsuCheck } from "./data/psu";
 import { gpus, type GPU } from "./data/gpus";
 import { cpus, type CPU } from "./data/cpus";
@@ -443,25 +445,41 @@ if (
 }
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white">
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="mb-10">
-          <p className="mb-2 text-sm font-semibold text-green-400">
-            GAMING PC CHECKER
-          </p>
+    <main className={styles.page}>
+      <div className={styles.shell}>
+        <header className={styles.header}>
+          <a href="#" className={styles.brand} aria-label="PC FPS診断 トップ">
+            <span className={styles.brandMark} aria-hidden="true">F<span>↗</span></span>
+            <span>FPS<span className={styles.brandLight}> CHECKER</span></span>
+          </a>
+          <a href="#configure" className={styles.headerLink}>PCの性能をチェック <span aria-hidden="true">↗</span></a>
+        </header>
 
-          <h1 className="text-4xl font-bold">
-            ゲーミングPC FPS診断
-          </h1>
+        <section className={styles.hero} aria-labelledby="hero-title">
+          <div>
+            <p className={styles.eyebrow}><span className={styles.statusDot} /> GAMING PC PERFORMANCE</p>
+            <h1 id="hero-title" className={styles.heroTitle}>そのPCの、<br /><span>実力を知ろう。</span></h1>
+            <p className={styles.heroSubtitle}>ゲーミングPC FPS診断</p>
+            <p className={styles.heroDescription}>いつものゲームは、どこまで快適になる？<br />推定FPSからボトルネック、次のアップグレードまで。<br className={styles.desktopBreak} />あなたの構成に合った選択を、数字で見つけよう。</p>
+            <a href="#configure" className={styles.heroCta}>自分のPCを診断する <span aria-hidden="true">↗</span></a>
+            <div className={styles.heroTags}><span>無料・登録不要</span><span>CPU / GPU 対応</span><span>参考価格で比較</span></div>
+          </div>
+          <div className={styles.rigPreview}>
+            <div className={styles.previewHeading}><span>YOUR BUILD</span><span className={styles.previewBadge}>選択中の構成</span></div>
+            <div className={styles.chipArt} aria-hidden="true"><div className={styles.chip}><span>FPS</span><small>PERFORMANCE CHECK</small></div></div>
+            <dl className={styles.buildSpecs}>
+              <div><dt>CPU</dt><dd>{cpu.name}</dd></div>
+              <div><dt>GPU</dt><dd>{gpu.name}</dd></div>
+              <div><dt>GAME</dt><dd>{game.name}</dd></div>
+            </dl>
+            <div className={styles.previewBottom}><span>{resolution} <span aria-hidden="true">/</span> {quality}</span><span>{ram} GB RAM</span></div>
+          </div>
+        </section>
 
-          <p className="mt-4 max-w-3xl text-zinc-400">
-            CPU・GPU・ゲーム・解像度を選択すると、
-            推定FPS、1% Low、ボトルネック傾向、
-            アップグレード後の性能向上率を確認できます。
-          </p>
-        </div>
-
-        <div className="grid gap-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-6 md:grid-cols-2">
+        <AdSlot placement="home-middle" />
+        <section id="configure" className={styles.configSection} aria-labelledby="config-title">
+          <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>01 / CONFIGURATION</p><h2 id="config-title">あなたのPC構成</h2></div><p>パーツとプレイ環境を選択</p></div>
+        <div className={styles.configGrid}>
           <CPUSelect
            value={cpuId}
            onChange={setCpuId}
@@ -477,7 +495,8 @@ if (
             onChange={setGameId}
           />
 
-          <SelectBox
+          <div className={styles.panel}>
+            <SelectBox
             label="解像度"
             value={resolution}
             onChange={setResolution}
@@ -486,9 +505,11 @@ if (
               { id: "1440p", name: "2560 × 1440" },
               { id: "4K", name: "3840 × 2160" },
             ]}
-          />
+            />
+          </div>
 
-          <SelectBox
+          <div className={styles.panel}>
+            <SelectBox
             label="画質"
             value={quality}
             onChange={setQuality}
@@ -499,9 +520,11 @@ if (
               { id: "High", name: "High" },
               { id: "Ultra", name: "Ultra" },
             ]}
-          />
+            />
+          </div>
 
-          <SelectBox
+          <div className={styles.panel}>
+            <SelectBox
             label="RAM"
             value={ram}
             onChange={setRam}
@@ -511,9 +534,10 @@ if (
               { id: "32", name: "32GB" },
               { id: "64", name: "64GB" },
             ]}
-          />
+            />
+          </div>
 
-          <div className="md:col-span-2">
+          <div className={`${styles.panel} ${styles.panelWide}`}>
             <SelectBox
               label="電源容量（PSU）"
               value={psu}
@@ -525,21 +549,20 @@ if (
                 })),
               ]}
             />
-            <p className="mt-2 text-sm text-zinc-400">
+            <p className={styles.hint}>
               PCの仕様書や電源のラベルにある定格容量を選択してください。一覧にない場合は「不明」を選んでください。
             </p>
           </div>
 
-          <label className="flex items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-950 p-4 md:col-span-2">
+          <label className={styles.usedToggle}>
             <input
               type="checkbox"
               checked={includeUsed}
               onChange={(event) => setIncludeUsed(event.target.checked)}
-              className="mt-1 h-4 w-4 accent-green-500"
             />
             <span>
-              <span className="block font-semibold text-zinc-200">中古も含める</span>
-              <span className="mt-1 block text-sm leading-6 text-zinc-400">
+              <span className={styles.usedTitle}>中古も含める</span>
+              <span className={styles.usedCopy}>
                 新品価格が確認できない候補だけ、中古参考価格をコスパ計算に使用します。中古価格が未登録の候補は計算対象になりません。
               </span>
             </span>
@@ -547,23 +570,25 @@ if (
 
           <button
             onClick={calculate}
-            className="md:col-span-2 rounded-xl bg-green-500 px-6 py-4 text-lg font-bold text-black hover:bg-green-400"
+            className={styles.calculateButton}
           >
-            FPSを診断する
+            FPSを診断する <span aria-hidden="true">↗</span>
           </button>
+          <p className={styles.estimateNote}>診断結果はベンチマーク傾向をもとにした推定値です。</p>
         </div>
+        </section>
 
         {result && (
           <>
-            <section className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-              <h2 className="mb-6 text-2xl font-bold">
-                現在の構成
-              </h2>
+            <section className={styles.resultSection} aria-labelledby="result-title">
+              <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>02 / PERFORMANCE REPORT</p><h2 id="result-title">現在の構成の診断結果</h2></div><span className={styles.previewBadge}>推定値</span></div>
+              <p className={styles.resultContext}>{game.name} · {resolution} · {quality} / {cpu.name} + {gpu.name}</p>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className={styles.resultGrid}>
                 <ResultCard
                   title="推定平均FPS"
                   value={`${result.avg} FPS`}
+                  variant="primary"
                 />
 
                 <ResultCard
@@ -579,10 +604,12 @@ if (
                 <ResultCard
                   title="ボトルネック傾向"
                   value={result.bottleneck}
+                  variant="bottleneck"
+                  tone={result.bottleneck === "バランス型" ? "ok" : "warn"}
                 />
               </div>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className={styles.resultGridSplit}>
                 <ResultCard
                   title="CPU側 推定上限"
                   value={`${result.cpuLimit} FPS`}
@@ -594,51 +621,52 @@ if (
                 />
               </div>
             </section>
-            <section className="mt-6" aria-label="現在の構成の電源チェック">
-              <h2 className="mb-3 text-xl font-bold">現在の構成の電源チェック</h2>
-              <p className="mb-3 text-sm text-zinc-400">選択中GPU：{gpu.name}</p>
+            <AdSlot placement="result-bottom" />
+            <section className={styles.statusBlock} aria-label="現在の構成の電源チェック">
+              <h2>現在の構成の電源チェック</h2>
+              <p className={styles.statusCopy}>選択中GPU：{gpu.name}</p>
               <PsuStatus check={currentPsu} />
-              <p className="mt-3 text-sm text-zinc-400">
+              <p className={styles.statusCopy}>
                 GPUメーカーの標準構成向け推奨容量との比較です。CPU別の消費電力・補助電源端子・電源の劣化は判定に含みません。
                 実際のCPU構成とグラフィックボード製品の指定条件も確認してください。
               </p>
             </section>
-            <section className="mt-6">
+            <section className={styles.statusBlock}>
   {!vramShortage ? (
-    <div className="rounded-xl border border-green-900 bg-green-950/20 p-5">
-      <p className="text-sm font-bold text-green-400">
+    <div className={`${styles.statusCard} ${styles.statusOk}`}>
+      <p className={styles.statusKicker}>
         VRAM
       </p>
 
-      <p className="mt-1 text-lg font-bold">
+      <p className={styles.statusTitle}>
         VRAM容量は十分な目安です
       </p>
 
-      <p className="mt-2 text-sm text-zinc-400">
+      <p className={styles.statusMeta}>
         選択中GPU：{gpu.vram}GB
         {" / "}
         推定必要量：約{requiredVram}GB
       </p>
     </div>
   ) : (
-    <div className="rounded-xl border border-yellow-800 bg-yellow-950/30 p-5">
-      <p className="text-sm font-bold text-yellow-300">
+    <div className={`${styles.statusCard} ${styles.statusWarn}`}>
+      <p className={styles.statusKicker}>
         VRAM注意
       </p>
 
-      <p className="mt-1 text-lg font-bold text-yellow-100">
+      <p className={styles.statusTitle}>
         VRAM容量が不足する可能性があります
       </p>
 
-      <p className="mt-3 text-sm text-yellow-100">
+      <p className={styles.statusMeta}>
         選択中GPU：{gpu.vram}GB
       </p>
 
-      <p className="mt-1 text-sm text-yellow-100">
+      <p className={styles.statusMeta}>
         推定必要量：約{requiredVram}GB
       </p>
 
-      <p className="mt-3 text-sm text-zinc-400">
+      <p className={styles.statusMeta}>
         約{vramDifference}GB不足する可能性があります。
         テクスチャ品質の低下、カクつき、
         1% Lowの悪化が起こる場合があります。
@@ -647,73 +675,73 @@ if (
   )}
 </section>
 
-            <section className="mt-8 rounded-2xl border border-green-900 bg-green-950/20 p-6">
-            <section className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-  <p className="text-sm font-bold text-green-400">
+            <section className={styles.upgradeSection}>
+            <section className={styles.verdict}>
+  <p className={styles.verdictKicker}>
     UPGRADE VERDICT
   </p>
 
-  <h2 className="mt-2 text-3xl font-bold">
+  <h2 className={styles.verdictTitle}>
     {upgradeVerdict}
   </h2>
 
-  <p className="mt-3 max-w-3xl text-zinc-400">
+  <p className={styles.verdictReason}>
     {upgradeReason}
   </p>
 
-  <div className="mt-6 grid gap-4 sm:grid-cols-2">
-    <div className="rounded-xl bg-zinc-950 p-5">
-      <p className="text-sm text-zinc-500">
+  <div className={styles.verdictStats}>
+    <div className={styles.miniStat}>
+      <p className={styles.miniStatLabel}>
         GPU交換時 最大
       </p>
 
-      <p className="mt-1 text-2xl font-bold">
+      <p className={styles.miniStatValue}>
         +{bestGPUGain}%
       </p>
     </div>
 
-    <div className="rounded-xl bg-zinc-950 p-5">
-      <p className="text-sm text-zinc-500">
+    <div className={styles.miniStat}>
+      <p className={styles.miniStatLabel}>
         CPU交換時 最大
       </p>
 
-      <p className="mt-1 text-2xl font-bold">
+      <p className={styles.miniStatValue}>
         +{bestCPUGain}%
       </p>
     </div>
   </div>
 
-  <div className="mt-5 rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-    <p className="text-sm text-zinc-400">
+  <div className={styles.bottleneckInline}>
+    <p className={styles.miniStatLabel}>
       現在のボトルネック傾向
     </p>
 
-    <p className="mt-1 text-lg font-bold">
+    <p className={`${styles.bottleneckValue} ${currentPerformance.bottleneck === "バランス型" ? "" : styles.bottleneckWarn}`}>
       {currentPerformance.bottleneck}
     </p>
   </div>
 </section>
-  <div className="mb-6">
-    <p className="text-sm font-bold text-green-400">
+  <div className={styles.sectionIntro}>
+    <p className={styles.cardKicker}>
       UPGRADE CHECK
     </p>
 
-    <h2 className="mt-1 text-2xl font-bold">
+    <h2>
       アップグレード診断
     </h2>
 
-    <p className="mt-2 text-zinc-400">
+    <p>
       現在の構成とゲーム設定から、交換効果の高い候補を表示します。
     </p>
   </div>
 
-  <div className="mb-5 rounded-xl border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-400">
+  <div className={styles.priceNote}>
     <p>新品参考価格は国内新品・税込の掲載モデル1商品の販売例です。最安値ではなく、自動更新でもありません。確認日と販売店リンクをご覧ください。</p>
-    <p className="mt-2">1FPS向上あたり＝交換パーツの参考価格 ÷ 推定平均FPSの増加量。送料・ポイント・売却額・電源などの追加費用は含みません。新品価格がある場合は新品を優先し、中古を含める設定では新品価格がない候補だけ中古参考価格を使用します。</p>
-    <p className="mt-2">現在、中古価格を確認できた商品は登録していません。価格未確認の商品に架空の価格は設定していません。</p>
+    <p>1FPS向上あたり＝交換パーツの参考価格 ÷ 推定平均FPSの増加量。送料・ポイント・売却額・電源などの追加費用は含みません。新品価格がある場合は新品を優先し、中古を含める設定では新品価格がない候補だけ中古参考価格を使用します。</p>
+    <p>現在、中古価格を確認できた商品は登録していません。価格未確認の商品に架空の価格は設定していません。</p>
   </div>
 
-  <div className="grid gap-4 lg:grid-cols-3">
+  <div className={styles.recommendGrid}>
 
     <RecommendationCard
       title="コスパ候補（価格確認済み）"
@@ -733,16 +761,16 @@ if (
   </div>
 </section>
 
-            <section className="mt-8">
-              <h2 className="text-2xl font-bold">
+            <section className={styles.compareSection}>
+              <h2>
                 GPU交換時の性能比較
               </h2>
 
-              <p className="mt-2 text-zinc-400">
+              <p>
                 現在のGPUから交換した場合の推定値です。
               </p>
 
-              <div className="mt-5 grid gap-4">
+              <div className={styles.compareList}>
                 {gpuUpgrades.map((upgrade) => (
                   <UpgradeCard
                     key={upgrade.name}
@@ -752,17 +780,17 @@ if (
               </div>
             </section>
 
-            <section className="mt-8">
-              <h2 className="text-2xl font-bold">
+            <section className={styles.compareSection}>
+              <h2>
                 CPU交換時の性能比較
               </h2>
 
-              <p className="mt-2 text-zinc-400">
+              <p>
                 同一プラットフォームのCPUのみ表示しています。
                 現在のCPUは {cpu.platform} です。
               </p>
 
-              <div className="mt-5 grid gap-4">
+              <div className={styles.compareList}>
                 {cpuUpgrades.length > 0 ? (
                   cpuUpgrades.map((upgrade) => (
                     <UpgradeCard
@@ -771,14 +799,14 @@ if (
                     />
                   ))
                 ) : (
-                  <div className="rounded-xl bg-zinc-900 p-5 text-zinc-400">
+                  <div className={styles.emptyState}>
                     同一プラットフォームで有効なCPUアップグレード候補がありません。
                   </div>
                 )}
               </div>
             </section>
 
-            <div className="mt-8 rounded-xl border border-yellow-900 bg-yellow-950/30 p-5 text-sm text-yellow-200">
+            <div className={styles.disclaimer}>
               表示FPSはベンチマーク傾向をもとにした目安です。
               実際のFPSはゲームバージョン、ドライバー、設定、冷却などにより変動します。
             </div>
@@ -916,15 +944,15 @@ function CPUSelect({
   }
 
   return (
-    <div>
-      <span className="mb-2 block text-sm font-semibold text-zinc-300">
+    <div className={styles.panel}>
+      <span className={styles.panelTitle}>
         CPU
       </span>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
 
         <label>
-          <span className="mb-2 block text-sm font-semibold text-zinc-400">
+          <span className={styles.fieldLabel}>
             メーカー
           </span>
 
@@ -933,7 +961,7 @@ function CPUSelect({
             onChange={(event) =>
               changeVendor(event.target.value)
             }
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"
+            className={styles.control}
           >
             {vendors.map((item) => (
               <option
@@ -947,7 +975,7 @@ function CPUSelect({
         </label>
 
         <label>
-          <span className="mb-2 block text-sm font-semibold text-zinc-400">
+          <span className={styles.fieldLabel}>
             世代
           </span>
 
@@ -958,7 +986,7 @@ function CPUSelect({
                 event.target.value
               )
             }
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"
+            className={styles.control}
           >
             {generations.map((item) => (
               <option
@@ -972,7 +1000,7 @@ function CPUSelect({
         </label>
 
         <label>
-          <span className="mb-2 block text-sm font-semibold text-zinc-400">
+          <span className={styles.fieldLabel}>
             型番
           </span>
 
@@ -981,7 +1009,7 @@ function CPUSelect({
             onChange={(event) =>
               onChange(event.target.value)
             }
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"
+            className={styles.control}
           >
             {filteredCPUs.map((cpu) => (
               <option
@@ -1067,14 +1095,14 @@ function GPUSelect({
   }
 
   return (
-    <div>
-      <span className="mb-2 block text-sm font-semibold text-zinc-300">
+    <div className={styles.panel}>
+      <span className={styles.panelTitle}>
         GPU
       </span>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
   <label>
-    <span className="mb-2 block text-sm font-semibold text-zinc-400">
+    <span className={styles.fieldLabel}>
       メーカー
     </span>
 
@@ -1083,7 +1111,7 @@ function GPUSelect({
       onChange={(event) =>
         changeVendor(event.target.value as GPU["vendor"])
       }
-      className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"
+      className={styles.control}
     >
       {vendors.map((item) => (
         <option key={item} value={item}>
@@ -1094,7 +1122,7 @@ function GPUSelect({
   </label>
 
   <label>
-    <span className="mb-2 block text-sm font-semibold text-zinc-400">
+    <span className={styles.fieldLabel}>
       シリーズ
     </span>
 
@@ -1103,7 +1131,7 @@ function GPUSelect({
       onChange={(event) =>
         changeFamily(event.target.value)
       }
-      className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"
+      className={styles.control}
     >
       {families.map((item) => (
         <option key={item} value={item}>
@@ -1114,7 +1142,7 @@ function GPUSelect({
   </label>
 
   <label>
-    <span className="mb-2 block text-sm font-semibold text-zinc-400">
+    <span className={styles.fieldLabel}>
       型番
     </span>
 
@@ -1123,7 +1151,7 @@ function GPUSelect({
       onChange={(event) =>
         onChange(event.target.value)
       }
-      className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"
+      className={styles.control}
     >
       {filteredGPUs.map((gpu) => (
         <option key={gpu.id} value={gpu.id}>
@@ -1171,26 +1199,28 @@ function GameSelect({
   );
 
   return (
-    <div>
-      <span className="mb-2 block text-sm font-semibold text-zinc-300">
+    <div className={`${styles.panel} ${styles.panelWide}`}>
+      <span className={styles.panelTitle}>
         ゲーム
       </span>
 
       <input
         type="text"
+        aria-label="ゲーム名を検索"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
         placeholder="ゲーム名を検索..."
-        className="mb-3 w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none placeholder:text-zinc-600 focus:border-green-500"
+        className={styles.control}
       />
 
       <select
+        aria-label="ゲーム"
         value={value}
         onChange={(event) => {
           onChange(event.target.value);
           setSearch("");
         }}
-        className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none focus:border-green-500"
+        className={`${styles.control} ${styles.stackedControl}`}
       >
         {selectedGame && !isSelectedGameVisible && (
           <option value={selectedGame.id}>
@@ -1203,13 +1233,11 @@ function GameSelect({
               <optgroup
                 key={category}
                 label={category}
-                className="bg-zinc-900 font-bold text-green-400"
               >
                 {categoryGames.map((game) => (
                   <option
                     key={game.id}
                     value={game.id}
-                    className="bg-zinc-950 font-normal text-white"
                   >
                     {game.name}
                   </option>
@@ -1225,7 +1253,7 @@ function GameSelect({
       </select>
 
       {search && (
-        <p className="mt-2 text-xs text-zinc-500">
+        <p className={styles.searchHint}>
           {filteredGames.length}件のゲームが見つかりました
         </p>
       )}
@@ -1246,14 +1274,14 @@ function SelectBox({
 }) {
   return (
     <label>
-      <span className="mb-2 block text-sm font-semibold text-zinc-300">
+      <span className={styles.fieldLabel}>
         {label}
       </span>
 
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white"
+        className={styles.control}
       >
         {options.map((option) => (
           <option key={option.id} value={option.id}>
@@ -1268,14 +1296,28 @@ function SelectBox({
 function ResultCard({
   title,
   value,
+  variant = "default",
+  tone = "ok",
 }: {
   title: string;
   value: string;
+  variant?: "default" | "primary" | "bottleneck";
+  tone?: "ok" | "warn";
 }) {
   return (
-    <div className="rounded-xl bg-zinc-950 p-5">
-      <p className="text-sm text-zinc-400">{title}</p>
-      <p className="mt-2 text-2xl font-bold">{value}</p>
+    <div
+      className={`${styles.resultCard} ${
+        variant === "primary" ? styles.resultCardPrimary : ""
+      }`}
+    >
+      <p className={styles.metricLabel}>{title}</p>
+      {variant === "bottleneck" ? (
+        <p className={`${styles.bottleneckValue} ${tone === "warn" ? styles.bottleneckWarn : ""}`}>
+          {value}
+        </p>
+      ) : (
+        <p className={styles.metricValue}>{value}</p>
+      )}
     </div>
   );
 }
@@ -1304,12 +1346,12 @@ function RecommendationCard({
 }) {
   if (!item) {
     return (
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <p className="text-sm font-bold text-zinc-400">
+      <div className={styles.recommendationCard}>
+        <p className={styles.cardKicker}>
           {title}
         </p>
 
-        <p className="mt-4 text-zinc-500">
+        <p className={styles.statusMeta}>
           条件に合う候補がありません。
         </p>
       </div>
@@ -1317,51 +1359,51 @@ function RecommendationCard({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-700 bg-zinc-900 p-5">
-      <p className="text-sm font-bold text-green-400">
+    <div className={styles.recommendationCard}>
+      <p className={styles.cardKicker}>
         {title}
       </p>
 
-      <h3 className="mt-2 text-xl font-bold">
+      <h3>
         {item.name}
       </h3>
 
       <RakutenLinkButton rakutenUrl={rakutenAffiliateLinks[item.id]?.rakutenUrl} />
 
-      <div className="mt-5 space-y-3">
+      <div className={styles.specList}>
 
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
+        <div className={styles.specRow}>
+          <span>
             平均FPS
           </span>
 
-          <span className="font-bold">
+          <span>
             {item.avg} FPS
           </span>
         </div>
 
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
+        <div className={styles.specRow}>
+          <span>
             FPS向上
           </span>
 
-          <span className="font-bold text-green-400">
+          <span className={styles.gain}>
             +{item.avgGain}%
           </span>
         </div>
 
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
+        <div className={styles.specRow}>
+          <span>
             1% Low向上
           </span>
 
-          <span className="font-bold text-green-400">
+          <span className={styles.gain}>
             +{item.lowGain}%
           </span>
         </div>
 
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
+        <div className={styles.specRow}>
+          <span>
             {item.priceType === "中古"
               ? "中古参考価格"
               : item.priceType === "新品"
@@ -1369,7 +1411,7 @@ function RecommendationCard({
                 : "価格未確認"}
           </span>
 
-          <span className="font-bold">
+          <span className={styles.priceValue}>
             {formatPrice(item.priceYen)}
           </span>
         </div>
@@ -1377,12 +1419,12 @@ function RecommendationCard({
         <PriceDetails info={item.priceInfo} type={item.priceType} />
 
         {item.yenPerFps !== null && (
-          <div className="flex justify-between">
-            <span className="text-zinc-400">
+          <div className={styles.specRow}>
+            <span>
               1FPS向上あたり
             </span>
 
-            <span className="font-bold">
+            <span className={styles.priceValue}>
               ¥
               {item.yenPerFps.toLocaleString(
                 "ja-JP"
@@ -1391,12 +1433,12 @@ function RecommendationCard({
           </div>
         )}
 
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
+        <div className={styles.specRow}>
+          <span>
             交換後
           </span>
 
-          <span className="font-bold">
+          <span>
             {item.bottleneck}
           </span>
         </div>
@@ -1445,57 +1487,57 @@ function UpgradeCard({
   psuCheck: PsuCheck;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
+    <div className={styles.upgradeCard}>
       <div className="flex flex-col gap-6">
 
         <div>
-          <p className="text-xs font-bold text-green-400">
+          <p className={styles.cardKicker}>
             {type} UPGRADE
           </p>
 
-          <h3 className="mt-1 text-xl font-bold">
+          <h3>
             {name}
           </h3>
 
-          <p className="mt-2 text-sm text-zinc-400">
+          <p className={styles.statusMeta}>
             {effect}
           </p>
 
           <RakutenLinkButton rakutenUrl={rakutenAffiliateLinks[id]?.rakutenUrl} />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className={styles.upgradeGrid}>
 
-          <div className="rounded-xl bg-zinc-950 p-4">
-            <p className="text-xs text-zinc-500">
+          <div className={styles.miniStat}>
+            <p className={styles.miniStatLabel}>
               平均FPS
             </p>
 
-            <p className="mt-1 text-xl font-bold">
+            <p className={styles.metricValue}>
               {avg} FPS
             </p>
 
-            <p className="mt-1 text-sm font-bold text-green-400">
+            <p className={styles.gain}>
               +{avgGain}%
             </p>
           </div>
 
-          <div className="rounded-xl bg-zinc-950 p-4">
-            <p className="text-xs text-zinc-500">
+          <div className={styles.miniStat}>
+            <p className={styles.miniStatLabel}>
               1% Low
             </p>
 
-            <p className="mt-1 text-xl font-bold">
+            <p className={styles.metricValue}>
               {low} FPS
             </p>
 
-            <p className="mt-1 text-sm font-bold text-green-400">
+            <p className={styles.gain}>
               +{lowGain}%
             </p>
           </div>
 
-          <div className="rounded-xl bg-zinc-950 p-4">
-            <p className="text-xs text-zinc-500">
+          <div className={styles.miniStat}>
+            <p className={styles.miniStatLabel}>
               {priceType === "中古"
                 ? "中古参考価格"
                 : priceType === "新品"
@@ -1503,19 +1545,19 @@ function UpgradeCard({
                   : "価格未確認"}
             </p>
 
-            <p className="mt-1 text-xl font-bold">
+            <p className={`${styles.metricValue} ${styles.priceValue}`}>
               {formatPrice(priceYen)}
             </p>
 
             <PriceDetails info={priceInfo} type={priceType} />
           </div>
 
-          <div className="rounded-xl bg-zinc-950 p-4">
-            <p className="text-xs text-zinc-500">
+          <div className={styles.miniStat}>
+            <p className={styles.miniStatLabel}>
               1FPS向上あたり
             </p>
 
-            <p className="mt-1 text-xl font-bold">
+            <p className={`${styles.metricValue} ${styles.priceValue}`}>
               {yenPerFps !== null
                 ? `¥${yenPerFps.toLocaleString(
                     "ja-JP"
@@ -1526,35 +1568,35 @@ function UpgradeCard({
 
         </div>
 
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-          <div className="grid gap-3 md:grid-cols-3">
+        <div className={styles.bottleneckInline}>
+          <div className={styles.upgradeGrid}>
 
             <div>
-              <p className="text-xs text-zinc-500">
+              <p className={styles.miniStatLabel}>
                 FPS増加
               </p>
 
-              <p className="font-bold text-green-400">
+              <p className={styles.gain}>
                 +{fpsGain} FPS
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-zinc-500">
+              <p className={styles.miniStatLabel}>
                 交換後
               </p>
 
-              <p className="font-bold">
+              <p>
                 {bottleneck}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-zinc-500">
+              <p className={styles.miniStatLabel}>
                 診断
               </p>
 
-              <p className="font-bold">
+              <p>
                 {effect}
               </p>
             </div>
@@ -1565,12 +1607,12 @@ function UpgradeCard({
         <PsuStatus check={psuCheck} />
 
         {warning && (
-  <div className="rounded-xl border border-yellow-800 bg-yellow-950/30 p-4">
-    <p className="text-sm font-bold text-yellow-300">
+  <div className={`${styles.statusCard} ${styles.statusWarn}`}>
+    <p className={styles.statusKicker}>
       注意
     </p>
 
-    <p className="mt-1 text-sm text-yellow-100">
+    <p className={styles.statusMeta}>
       {warning}
     </p>
   </div>
@@ -1586,33 +1628,33 @@ function RakutenLinkButton({ rakutenUrl }: { rakutenUrl: string | null | undefin
 
   return (
     <a
-      className="mt-4 inline-flex w-fit items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white hover:bg-red-500"
+      className={styles.affiliateLink}
       href={rakutenUrl}
       target="_blank"
       rel="sponsored nofollow noopener noreferrer"
     >
-      楽天市場で探す <span className="ml-2 text-xs">広告・PR</span>
+      楽天市場で探す <span className={styles.affiliateMark}>広告・PR</span>
     </a>
   );
 }
 
 function PsuStatus({ check }: { check: PsuCheck }) {
-  const styles = {
-    sufficient: "border-green-900 bg-green-950/20 text-green-200",
-    review: "border-yellow-800 bg-yellow-950/30 text-yellow-200",
-    replace: "border-red-900 bg-red-950/30 text-red-200",
+  const tone = {
+    sufficient: styles.statusOk,
+    review: styles.statusWarn,
+    replace: styles.statusBad,
   };
   return (
-    <div className={"rounded-xl border p-4 " + styles[check.status]}>
-      <p className="text-xs font-semibold">電源容量（GPU推奨値基準）</p>
-      <p className="mt-1 font-bold">{check.label}</p>
-      <p className="mt-2 text-sm">
+    <div className={`${styles.statusCard} ${tone[check.status]}`}>
+      <p className={styles.statusKicker}>電源容量（GPU推奨値基準）</p>
+      <p className={styles.statusTitle}>{check.label}</p>
+      <p className={styles.statusMeta}>
         使用電源：{check.psuW === null ? "不明" : check.psuW + "W"}
         {" / "}推奨：{check.recommendedPsuW === null ? "未確認" : check.recommendedPsuW + "W以上"}
       </p>
-      <p className="mt-2 text-sm">{check.reason}</p>
+      <p className={styles.statusMeta}>{check.reason}</p>
       {check.sourceUrl && (
-        <a className="mt-2 inline-block text-sm underline" href={check.sourceUrl} target="_blank" rel="noreferrer">
+        <a className={styles.statusLink} href={check.sourceUrl} target="_blank" rel="noreferrer">
           メーカーの推奨値を確認
         </a>
       )}
@@ -1629,7 +1671,7 @@ function PriceDetails({
 }) {
   if (!info) {
     return (
-      <p className="mt-2 text-xs text-zinc-400">
+      <p className={styles.priceDetails}>
         {type === "中古"
           ? "中古参考価格は未確認です。"
           : type === "新品"
@@ -1645,8 +1687,8 @@ function PriceDetails({
     : null;
 
   return (
-    <div className="mt-2 space-y-2 text-xs text-zinc-400">
-      <p className="font-semibold text-zinc-300">
+    <div className={styles.priceDetails}>
+      <p>
         {type === "中古"
           ? "中古参考価格"
           : type === "新品"
@@ -1661,20 +1703,20 @@ function PriceDetails({
         <MercariMarketDetails market={mercariMarket} />
       )}
       <details>
-        <summary className="cursor-pointer text-zinc-300">価格の確認元・対象モデル</summary>
-        <p className="mt-2 break-words">{info.productName}</p>
+        <summary>価格の確認元・対象モデル</summary>
+        <p>{info.productName}</p>
         {info.sourceUrl && (
-          <a className="mt-2 block underline" href={info.sourceUrl} target="_blank" rel="noreferrer">
+          <a className={styles.statusLink} href={info.sourceUrl} target="_blank" rel="noreferrer">
             {info.sourceName}の掲載確認元
           </a>
         )}
         {info.productUrl && info.productUrl !== info.sourceUrl && (
-          <a className="mt-2 block underline" href={info.productUrl} target="_blank" rel="noreferrer">
+          <a className={styles.statusLink} href={info.productUrl} target="_blank" rel="noreferrer">
             商品ページで現在の価格・在庫を確認
           </a>
         )}
         {"historical" in info && info.historical && info.historical.length > 0 && (
-          <div className="mt-3 border-t border-zinc-800 pt-2">
+          <div>
             <p>過去の参考価格（現在のコスパ計算には不使用）</p>
             {info.historical.map((historical) => (
               <p key={`${historical.checkedAt}-${historical.priceYen}`}>
@@ -1692,9 +1734,9 @@ function MercariMarketDetails({ market }: { market: MercariMarketInfo }) {
   if (market.medianPriceYen === null) return null;
 
   return (
-    <div className="mt-3 border-t border-zinc-800 pt-3">
-      <p className="font-semibold text-zinc-300">メルカリ中古相場</p>
-      <p className="mt-1 text-base font-bold text-white">
+    <div className={styles.priceDetails}>
+      <p>メルカリ中古相場</p>
+      <p className={styles.priceValue}>
         ¥{market.medianPriceYen.toLocaleString("ja-JP")}
       </p>
       {market.sampleCount !== null && <p>サンプル数：{market.sampleCount}件</p>}
